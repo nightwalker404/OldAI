@@ -9,19 +9,19 @@ import (
 )
 
 type Message struct {
-	Role    string `json: "role"`
-	Content string `json: "content"`
+	Role    string `json:"role"`
+	Content string `json:"content"`
 }
 
 type ClientRequest struct {
-	Model    string    `json: "model"`
-	Messages []Message `json: "messages"`
+	Model    string    `json:"model"`
+	Messages []Message `json:"messages"`
 }
 
 type ClientResponse struct {
 	Choices []struct {
-		Message Message `json: "message"`
-	} `json: "choices"`
+		Message Message `json:"message"`
+	} `json:"choices"`
 }
 
 type Client struct {
@@ -32,7 +32,7 @@ type Client struct {
 func NewClient(model, baseURL string) *Client {
 	return &Client{
 		Model:   model,
-		BaseURL: baseURL,
+		BaseURL: baseURL + "/v1/chat/completions",
 	}
 }
 
