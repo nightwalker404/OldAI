@@ -14,7 +14,7 @@ type Config struct {
 	VLLMPort                 int     `env:"VLLM_PORT"`
 	VLLMBaseURL              string  `env:"VLLM_BASE_URL"`
 	VLLMTimeout              string  `env:"VLLM_TIMEOUT"`
-	VLLMModes                string  `env:"VLLM_MODELS"`
+	VLLMModel                string  `env:"VLLM_MODEL"`
 	VLLMGPUMemoryUtilization float64 `env:"VLLM_GPU_MEMORY_UTILIZATION"`
 	VLLMMaxModelLen          int     `env:"VLLM_MAX_MODEL_LEN"`
 }
