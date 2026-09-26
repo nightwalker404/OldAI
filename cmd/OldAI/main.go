@@ -30,7 +30,7 @@ func main() {
 
 	client := vllmclient.NewClient(cfg.VLLMModel, cfg.VLLMBaseURL)
 
-	storage := storage.New(cfg.RedisHost + ":" + strconv.Itoa(cfg.RedisPort))
+	storage := storage.New(cfg.RedisHost+":"+strconv.Itoa(cfg.RedisPort), cfg.RedisPassword)
 	log.Println("Storage initialized:", storage)
 
 	history, err := storage.Load(cfg.RedisSession)
