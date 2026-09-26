@@ -1,0 +1,51 @@
+services:
+  redis:
+    image: redis:alpine3.22
+    container_name: OldAIRedis
+    env_file:
+    - .env
+    ports:
+      - "${RedisPort}:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --requirepass ${RedisPassword}
+  
+  vllm:
+    image: vllm/vllm-openai:v0.6.3
+    container_name: OldAIVLLM
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+      - /dev/shm:/dev/shm
+    ports:
+      - "${VLLM_PORT}:8000"
+    ipc: host
+    shm_size: "2gb"
+    env_file:
+      - .env
+    command: >
+      --model Qwen/Qwen2.5-0.5B-Instruct
+      --host 0.0.0.0
+      --port 8000
+      --gpu-memory-utilization ${VLLM_GPU_MEMORY_UTILIZATION}
+      --max-model-len ${VLLM_MAX_MODEL_LEN}
+      --enforce-eager
+      --dtype half
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - vllm-net
+    
+networks:
+  vllm-net:
+
+volumes:
+  redis-data:
