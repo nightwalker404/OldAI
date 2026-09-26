@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to load configuration:", err)
 	} else {
-		log.Printf("Configuration loaded: %+v\n", cfg)
+		log.Println("Configuration loaded")
 	}
 
 	client := vllmclient.NewClient(cfg.VLLMModel, cfg.VLLMBaseURL)
