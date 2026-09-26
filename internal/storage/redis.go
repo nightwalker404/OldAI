@@ -19,26 +19,30 @@ func New(addr string) *Storage {
 	return &Storage{rdb: rdb}
 }
 
-func (s *Storage) Save(SessionID string, history []vllmclient.Message) error {
-	data, err := json.Marshal(history)
+func (s *Storage) AppendMessage(SessionID string, message vllmclient.Message) error {
+	data, err := json.Marshal(message)
 	if err != nil {
 		return err
 	}
 
-	return s.rdb.Set(ctx, "chat:"+SessionID, data, 0).Err()
+	return s.rdb.RPush(ctx, "chat:"+SessionID, data).Err()
 }
 
 func (s *Storage) Load(SessionID string) ([]vllmclient.Message, error) {
-	data, err := s.rdb.Get(ctx, "chat:"+SessionID).Result()
+	data, err := s.rdb.LRange(ctx, "chat:"+SessionID, 0, -1).Result()
 	if err == redis.Nil {
 		return []vllmclient.Message{}, redis.Nil
 	} else if err != nil {
 		return nil, err
 	}
 
-	var history []vllmclient.Message
-	if err := json.Unmarshal([]byte(data), &history); err != nil {
-		return nil, err
+	history := make([]vllmclient.Message, 0, len(data))
+	for _, d := range data {
+		var msg vllmclient.Message
+		if err := json.Unmarshal([]byte(d), &msg); err != nil {
+			return nil, err
+		}
+		history = append(history, msg)
 	}
 
 	return history, nil

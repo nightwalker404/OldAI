@@ -70,5 +70,6 @@ func main() {
 		} else {
 			log.Println("No response from the model.")
 		}
+		storage.AppendMessage(cfg.RedisSession, vllmclient.Message{Role: "user", Content: input})
 	}
 }
