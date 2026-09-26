@@ -5,9 +5,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var cfg Config
+
 type Config struct {
 	RedisPort                int     `env:"RedisPort"`
 	RedisHost                string  `env:"RedisHost"`
+	RedisSession             string  `env:"RedisSession"`
 	VLLMPort                 int     `env:"VLLM_PORT"`
 	VLLMBaseURL              string  `env:"VLLM_BASE_URL"`
 	VLLMTimeout              string  `env:"VLLM_TIMEOUT"`
@@ -24,4 +27,8 @@ func LoadConfig() (Config, error) {
 		return Config{}, err
 	}
 	return cfg, nil
+}
+
+func Get() Config {
+	return cfg
 }
