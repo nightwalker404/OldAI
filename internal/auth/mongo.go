@@ -8,7 +8,7 @@ import (
 )
 
 type Storage struct {
-	client *mongo.Collection
+	collection *mongo.Collection
 }
 
 func New(uri, dbName, collectionName string) (*Storage, error) {
