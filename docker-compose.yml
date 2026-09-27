@@ -45,9 +45,24 @@ services:
     restart: unless-stopped
     networks:
       - vllm-net
+
+  mongo:
+    image: mongo:6.0
+    container_name: OldAIMongo
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MongoRootUsername}
+      - MONGO_INITDB_ROOT_PASSWORD=${MongoRootPassword}
+    ports:
+      - "${MongoPort}:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
     
 networks:
   vllm-net:
 
 volumes:
   redis-data:
+  mongo-data:
