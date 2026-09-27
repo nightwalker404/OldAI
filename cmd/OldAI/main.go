@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nightwalker404/OldAI/internal/auth"
 	"github.com/nightwalker404/OldAI/internal/config"
 	"github.com/nightwalker404/OldAI/internal/storage"
 	"github.com/nightwalker404/OldAI/internal/vllmclient"
@@ -33,7 +34,24 @@ func main() {
 	storage := storage.New(cfg.RedisHost+":"+strconv.Itoa(cfg.RedisPort), cfg.RedisPassword)
 	log.Println("Storage initialized:", storage)
 
-	history, err := storage.Load(cfg.RedisSession)
+	authDB, err := auth.NewDb(cfg.MongoURI, cfg.MongoDBName, "users")
+	if err != nil {
+		log.Fatal("Failed to connect to MongoDB:", err)
+	} else {
+		log.Println("Connected to MongoDB")
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	username, err := authenticateUser(authDB, reader)
+	if err != nil {
+		log.Fatal("Authentication failed:", err)
+	} else {
+		log.Println("User authenticated:", username)
+	}
+
+	fmt.Println("Welcome to OldAI chat, " + username + "! Type 'exit' to quit.")
+
+	history, err := storage.Load(username)
 	if err != nil {
 		log.Fatal("Failed to load history:", err)
 	} else if len(history) == 0 {
@@ -43,7 +61,6 @@ func main() {
 		log.Println("Loaded history for session completed")
 	}
 
-	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf("OldAI chat __ type 'exit' to quit")
 
 	for {
@@ -72,4 +89,55 @@ func main() {
 		}
 		storage.AppendMessage(cfg.RedisSession, vllmclient.Message{Role: "user", Content: input})
 	}
+}
+
+func authenticateUser(db *auth.DataBase, reader *bufio.Reader) (string, error) {
+	token, err := auth.LoadLocalToken()
+	if err != nil {
+		return "", err
+	}
+
+	username, err := db.ValidateSession(token)
+	if err == nil {
+		return username, nil
+	}
+
+	fmt.Println("1. Login")
+	fmt.Println("2. Register")
+	fmt.Print("Choose an option (1 or 2): ")
+	choice, _ := reader.ReadString('\n')
+	choice = strings.TrimSpace(choice)
+
+	if choice != "1" && choice != "2" {
+		return "", fmt.Errorf("invalid choice")
+	}
+
+	fmt.Print("Enter username: ")
+	username, _ = reader.ReadString('\n')
+	username = strings.TrimSpace(username)
+
+	fmt.Print("Enter password: ")
+	password, _ := reader.ReadString('\n')
+	password = strings.TrimSpace(password)
+
+	if choice == "1" {
+		if err := db.Login(username, password); err != nil {
+			return "", err
+		}
+	} else {
+		if err := db.Register(username, password); err != nil {
+			return "", err
+		}
+	}
+
+	token, err = db.CreateSession(username, 10*24*60*60) // 10 days in seconds
+	if err != nil {
+		return "", err
+	}
+
+	if err := auth.SaveLocalToken(token); err != nil {
+		return "", err
+	}
+
+	return username, nil
 }
