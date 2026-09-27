@@ -18,6 +18,9 @@ type Config struct {
 	VLLMModel                string  `env:"VLLM_MODEL"`
 	VLLMGPUMemoryUtilization float64 `env:"VLLM_GPU_MEMORY_UTILIZATION"`
 	VLLMMaxModelLen          int     `env:"VLLM_MAX_MODEL_LEN"`
+	MongoURI                 string  `env:"MONGO_URI"`
+	MongoDBName              string  `env:"MONGO_DB_NAME"`
+	MongoCollectionName      string  `env:"MONGO_COLLECTION_NAME"`
 }
 
 func LoadConfig() (Config, error) {
