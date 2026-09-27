@@ -47,13 +47,13 @@ services:
       - vllm-net
 
   mongo:
-    image: mongo:6.0
+    image: mongo:latest
     container_name: OldAIMongo
     env_file:
       - .env
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MongoRootUsername}
-      - MONGO_INITDB_ROOT_PASSWORD=${MongoRootPassword}
+      - MONGO_INITDB_ROOT_USERNAME=${MongoUser}
+      - MONGO_INITDB_ROOT_PASSWORD=${MongoPassword}
     ports:
       - "${MongoPort}:27017"
     volumes:
