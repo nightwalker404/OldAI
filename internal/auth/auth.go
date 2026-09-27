@@ -12,7 +12,7 @@ import (
 var ErrUserExists = errors.New("user Username already exists")
 var ErrUserNotFound = errors.New("invalid Username or Password")
 
-func (s *db) Register(username, password string) error {
+func (s *DataBase) Register(username, password string) error {
 	var existingUser User
 	err := s.collection.FindOne(context.Background(), bson.M{"username": username}).Decode(&existingUser)
 	if err == nil {
@@ -35,7 +35,7 @@ func (s *db) Register(username, password string) error {
 	return err
 }
 
-func (s *db) Login(username, password string) error {
+func (s *DataBase) Login(username, password string) error {
 	var user User
 	err := s.collection.FindOne(context.Background(), bson.M{"username": username}).Decode(&user)
 	if err == mongo.ErrNoDocuments {
