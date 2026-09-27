@@ -34,8 +34,7 @@ func (d *DataBase) CreateSession(username string, duration time.Duration) (strin
 	if err != nil {
 		return "", err
 	}
-
-	session := d.users.Database().Collection("sessions")
+	session := d.collection.Database().Collection("session")
 	_, err = session.InsertOne(context.Background(), Session{
 		Token:     token,
 		Username:  username,
@@ -49,7 +48,7 @@ func (d *DataBase) CreateSession(username string, duration time.Duration) (strin
 }
 
 func (d *DataBase) ValidateSession(token string) (string, error) {
-	session := d.users.Database().Collection("sessions")
+	session := d.collection.Database().Collection("sessions")
 	var s Session
 	err := session.FindOne(context.Background(), map[string]interface{}{"token": token}).Decode(&s)
 	if err == mongo.ErrNoDocuments {
