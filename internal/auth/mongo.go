@@ -8,17 +8,15 @@ import (
 )
 
 type Storage struct {
-	client *mongo.Client
+	client *mongo.Collection
 }
 
-func New(uri string) (*Storage, error) {
+func New(uri, dbName, collectionName string) (*Storage, error) {
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, err
 	}
-	return &Storage{client: client}, nil
-}
 
-func (s *Storage) Close() error {
-	return s.client.Disconnect(context.Background())
+	db := client.Database(dbName)
+	return &Storage{client: db.Collection(collectionName)}, nil
 }
