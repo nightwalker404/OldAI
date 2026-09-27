@@ -7,16 +7,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type db struct {
+type DataBase struct {
 	collection *mongo.Collection
 }
 
-func NewDb(uri, dbName, collectionName string) (*db, error) {
+func NewDb(uri, dbName, collectionName string) (*DataBase, error) {
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, err
 	}
 
 	database := client.Database(dbName)
-	return &db{collection: database.Collection(collectionName)}, nil
+	return &DataBase{collection: database.Collection(collectionName)}, nil
 }
