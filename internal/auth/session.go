@@ -83,10 +83,6 @@ func SaveLocalToken(token string) error {
 		return err
 	}
 
-	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
-		return err
-	}
-
 	data, err := json.Marshal(session)
 	if err != nil {
 		return err
@@ -103,6 +99,9 @@ func LoadLocalToken() (string, error) {
 
 	data, err := os.ReadFile(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return "", errors.New("session.json still missing after first run")
+		}
 		return "", err
 	}
 
@@ -112,4 +111,33 @@ func LoadLocalToken() (string, error) {
 	}
 
 	return session.Token, nil
+}
+
+func (d *DataBase) IsFirstRun() (bool, error) {
+	path, err := sessionFilePath()
+	if err != nil {
+		return false, err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		return false, err
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return true, nil
+	}
+	return false, nil
+}
+
+func (d *DataBase) CreateFirstRunSession() error {
+	token, err := generateToken()
+	if err != nil {
+		return err
+	}
+
+	if err := SaveLocalToken(token); err != nil {
+		return err
+	}
+
+	return nil
 }

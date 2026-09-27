@@ -92,6 +92,19 @@ func main() {
 }
 
 func authenticateUser(db *auth.DataBase, reader *bufio.Reader) (string, error) {
+	firstRun, err := db.IsFirstRun()
+	if err != nil {
+		return "", fmt.Errorf("failed to check first run: %w", err)
+	}
+
+	if firstRun {
+		fmt.Println("🔑 First run detected — creating temporary session...")
+		if err := db.CreateFirstRunSession(); err != nil {
+			return "", fmt.Errorf("failed to create first-run session: %w", err)
+		}
+		fmt.Println("✅ First-run session created. You can now register or login.")
+	}
+
 	token, err := auth.LoadLocalToken()
 	if err != nil {
 		return "", err
