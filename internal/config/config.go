@@ -20,7 +20,6 @@ type Config struct {
 	VLLMMaxModelLen          int     `env:"VLLM_MAX_MODEL_LEN"`
 	MongoURI                 string  `env:"MONGO_URI"`
 	MongoDBName              string  `env:"MONGO_DB_NAME"`
-	MongoCollectionName      string  `env:"MONGO_COLLECTION_NAME"`
 }
 
 func LoadConfig() (Config, error) {
