@@ -18,5 +18,5 @@ func New(uri, dbName, collectionName string) (*Storage, error) {
 	}
 
 	db := client.Database(dbName)
-	return &Storage{client: db.Collection(collectionName)}, nil
+	return &Storage{collection: db.Collection(collectionName)}, nil
 }
