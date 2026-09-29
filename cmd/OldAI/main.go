@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/nightwalker404/OldAI/internal/auth"
 	"github.com/nightwalker404/OldAI/internal/config"
@@ -143,7 +144,7 @@ func authenticateUser(db *auth.DataBase, reader *bufio.Reader) (string, error) {
 		}
 	}
 
-	token, err = db.CreateSession(username, 10*24*60*60) // 10 days in seconds
+	token, err = db.CreateSession(username, 10*24*time.Hour) // 10 days in seconds
 	if err != nil {
 		return "", err
 	}
