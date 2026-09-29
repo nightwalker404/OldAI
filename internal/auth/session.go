@@ -34,7 +34,7 @@ func (d *DataBase) CreateSession(username string, duration time.Duration) (strin
 	if err != nil {
 		return "", err
 	}
-	session := d.collection.Database().Collection("session")
+	session := d.collection.Database().Collection("sessions")
 	_, err = session.InsertOne(context.Background(), Session{
 		Token:     token,
 		Username:  username,
