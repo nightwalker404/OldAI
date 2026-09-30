@@ -139,5 +139,10 @@ func (d *DataBase) CreateFirstRunSession() error {
 		return err
 	}
 
+	_, err = d.collection.Database().Collection("sessions").InsertOne(
+		context.Background(),
+		Session{Token: token, Username: "first-run", ExpiresAt: time.Now().Add(24 * time.Hour)},
+	)
+
 	return nil
 }
