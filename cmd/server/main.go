@@ -56,25 +56,6 @@ func main() {
 
 func authenticateUser(db *auth.DataBase, conn net.Conn) (string, error) {
 	reader := bufio.NewReader(conn)
-	firstRun, err := db.IsFirstRun()
-	if err != nil {
-		return "", fmt.Errorf("failed to check first run: %w", err)
-	}
-
-	if firstRun {
-		fmt.Fprintln(conn, "🔑 First run detected — creating temporary session...")
-		if err := db.CreateFirstRunSession(); err != nil {
-			return "", fmt.Errorf("failed to create first-run session: %w", err)
-		}
-		fmt.Fprintln(conn, "✅ First-run session created. You can now register or login.")
-	}
-
-	token, err := auth.LoadLocalToken()
-	if err == nil {
-		if username, err := db.ValidateSession(token); err == nil {
-			return username, nil
-		}
-	}
 
 	fmt.Fprintln(conn, "1. Login")
 	fmt.Fprintln(conn, "2. Register")
@@ -104,12 +85,9 @@ func authenticateUser(db *auth.DataBase, conn net.Conn) (string, error) {
 		}
 	}
 
-	token, err = db.CreateSession(username, 10*24*time.Hour) // 10 days in seconds
+	// Optional: still create a DB session if you want, but do NOT save it to a local file
+	_, err := db.CreateSession(username, 10*24*time.Hour)
 	if err != nil {
-		return "", err
-	}
-
-	if err := auth.SaveLocalToken(token); err != nil {
 		return "", err
 	}
 
