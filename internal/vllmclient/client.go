@@ -36,7 +36,7 @@ func NewClient(model, baseURL string) *Client {
 	}
 }
 
-func (c *Client) CreateRequest(messages []Message, req ClientRequest) (ClientResponse, error) {
+func (c *Client) CreateRequest(messages []Message) (ClientResponse, error) {
 	body := ClientRequest{
 		Model:    c.Model,
 		Messages: messages,
